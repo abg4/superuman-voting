@@ -1,0 +1,15 @@
+{
+  "name": "superuman-voting",
+  "version": "1.0.0",
+  "description": "Script for voting on UMA Voting contract with Snapshot",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "author": "abg4",
+  "license": "ISC",
+  "dependencies": {
+    "@uma/common": "^2.23.0",
+    "web3": "^1.7.4"
+  }
+}
