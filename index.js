@@ -158,9 +158,7 @@ function voteParams() {
       "createdFromOwnerAddress": "",
       "checksum": ""
     },
-    "transactions":[
-      ${x}
-    ]
+    "transactions":[${x}]
   }`;
 
   const commitConsole = new console.Console(
