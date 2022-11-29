@@ -1,6 +1,5 @@
-const web3 = require("web3");
-const { padRight, utf8ToHex } = web3.utils;
 const { getRandomSignedInt, computeVoteHashAncillary } = require("@uma/common");
+const fs = require("fs");
 
 // networks file (https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/1.json)
 let votingContract = "0x8B1631ab830d11531aE83725fDa4D86012eCCd77";
@@ -8,42 +7,171 @@ let votingContract = "0x8B1631ab830d11531aE83725fDa4D86012eCCd77";
 let roundId = "9657";
 // safe address (should not need to be changed)
 let safe = "0xC75aDbf2a5a6A51302c1c7cC789366ed16e1E0F3";
-// voter dapp
-let rawIdentifier = "YES_NO_QUERY";
-// voter dapp
-let ancillaryData =
-  "0x6F6F5265717565737465723A63313836666139313433353363343462326533336562653035663231383436663130343862656461";
-// price you are voting for. Should be 0, 1000000000000000000, or magic number (TODO: add value)
-let priceOptions = ["1000000000000000000"];
-// voter dapp
-let time = 1668720167;
+
+// identifier: use voter dapp or logs
+// ancillaryData: use voter dapp or logs
+// price you are voting for. Should be 0, 1000000000000000000, or magic number (-57896044618658097711785492504343953926634992332820282019728792003956564819968)
+// time: use voter dapp or logs
+
+let votes = [
+  {
+    identifier:
+      "0x4143524F53532D56320000000000000000000000000000000000000000000000",
+    ancillaryData:
+      "0x6F6F5265717565737465723A63313836666139313433353363343462326533336562653035663231383436663130343862656461",
+    price: "0",
+    time: 1669328675,
+  },
+  // Template for when there are multiple votes in a round.
+  // {
+  //   identifier:
+  //     "",
+  //   ancillaryData:
+  //     "",
+  //   price: "",
+  //   time: ,
+  // },
+];
 
 // helpers (no need to edit)
-let salt = getRandomSignedInt();
-let identifier = padRight(utf8ToHex(rawIdentifier), 64);
+let magicNumber =
+  "-57896044618658097711785492504343953926634992332820282019728792003956564819968";
+let salt = 0;
 
+while (true) {
+  let generatedNumber = getRandomSignedInt();
+  if (
+    generatedNumber < Math.abs(magicNumber) &&
+    generatedNumber > magicNumber
+  ) {
+    salt = generatedNumber;
+    break;
+  }
+}
+
+let commits = [];
+let reveals = [];
 function voteParams() {
-  priceOptions.map((price) => {
+  if (salt > Math.abs(magicNumber) || salt < magicNumber) {
+    console.log("Salt is above or below magic number");
+    return;
+  }
+  votes.map((price) => {
     const hash = computeVoteHashAncillary({
-      price: price,
+      price: price.price,
       salt: salt,
       account: safe,
-      time: time,
-      ancillaryData: ancillaryData,
+      time: price.time,
+      ancillaryData: price.ancillaryData,
       roundId: roundId,
-      identifier: identifier,
+      identifier: price.identifier,
     });
 
-    let commitVote = `[{"to": "${votingContract}","value": "0", "method":"commitVote(bytes32,uint256,bytes,bytes32)", "params": ["${identifier}", "${time}", "${ancillaryData}", "${hash}"], "operation":"0"}]`;
-    let revealVote = `[{"to": "${votingContract}","value": "0","method":"revealVote(bytes32,uint256,int256,int256)","params": ["${identifier}", "${time}", "${price}","${ancillaryData}","${salt}"],"operation":"0"}]`;
+    commits.push(`
+        {
+          "to": "${votingContract}",
+          "value": "0",
+          "data": null,
+          "contractMethod": {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "identifier",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "time",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes",
+                "name": "ancillaryData",
+                "type": "bytes"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "hash",
+                "type": "bytes32"
+              }
+            ],
+            "name": "commitVote",
+            "payable": false
+          },
+          "contractInputsValues": {
+            "identifier": "${price.identifier}",
+            "time": "${price.time}",
+            "ancillaryData": "${price.ancillaryData}",
+            "hash": "${hash}"
+          }
+        }`);
 
-    console.log("Voting Details: ");
-    console.log("- Voting Contract: ", votingContract);
-    console.log("- Voting Round: ", roundId);
-    console.log("- Safe Address: ", safe);
-
-    console.log(commitVote + `\n` + revealVote);
+    reveals.push(`
+        {
+          "to": "${votingContract}",
+          "value": "0",
+          "data": null,
+          "contractMethod": {
+            "inputs": [
+              {
+                "internalType": "bytes32",
+                "name": "identifier",
+                "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "time",
+                "type": "uint256"
+              },
+              {
+                "internalType": "int256",
+                "name": "price",
+                "type": "int256"
+              },
+              {
+                "internalType": "int256",
+                "name": "salt",
+                "type": "int256"
+              }
+            ],
+            "name": "revealVote",
+            "payable": false
+          },
+          "contractInputsValues": {
+            "identifier": "${price.identifier}",
+            "time": "${price.time}",
+            "price": "${price.price}",
+            "salt": "${salt}"
+          }
+        }`);
   });
+
+  let voteJSON = (x) => `{
+    "version": "1.0",
+    "chainId": "1",
+    "createdAt": 1669736547670,
+    "meta": {
+      "name": "Transactions Batch",
+      "description": "",
+      "txBuilderVersion": "1.11.1",
+      "createdFromSafeAddress": "${safe}",
+      "createdFromOwnerAddress": "",
+      "checksum": ""
+    },
+    "transactions":[
+      ${x}
+    ]
+  }`;
+
+  const commitConsole = new console.Console(
+    fs.createWriteStream(`./output_files/commits_${roundId}.json`)
+  );
+  commitConsole.log(voteJSON(commits));
+
+  const revealConsole = new console.Console(
+    fs.createWriteStream(`./output_files/reveals_${roundId}.json`)
+  );
+  revealConsole.log(voteJSON(reveals));
 }
 
 voteParams();
