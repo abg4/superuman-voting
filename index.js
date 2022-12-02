@@ -3,8 +3,7 @@ const fs = require("fs");
 
 // networks file (https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/1.json)
 let votingContract = "0x8B1631ab830d11531aE83725fDa4D86012eCCd77";
-// voter dapp or voting contract
-let roundId = "9657";
+
 // safe address (should not need to be changed)
 let safe = "0xC75aDbf2a5a6A51302c1c7cC789366ed16e1E0F3";
 
@@ -13,6 +12,7 @@ let safe = "0xC75aDbf2a5a6A51302c1c7cC789366ed16e1E0F3";
 // price you are voting for. Should be 0, 1000000000000000000, or magic number (-57896044618658097711785492504343953926634992332820282019728792003956564819968)
 // time: use voter dapp or logs
 
+let roundId = "9664"; // voter dapp or voting contract
 let votes = [
   {
     identifier:
@@ -164,11 +164,12 @@ function voteParams() {
   const commitConsole = new console.Console(
     fs.createWriteStream(`./output_files/commits_${roundId}.json`)
   );
-  commitConsole.log(voteJSON(commits));
 
   const revealConsole = new console.Console(
     fs.createWriteStream(`./output_files/reveals_${roundId}.json`)
   );
+
+  commitConsole.log(voteJSON(commits));
   revealConsole.log(voteJSON(reveals));
 }
 
