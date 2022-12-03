@@ -129,6 +129,11 @@ function voteParams() {
                 "type": "int256"
               },
               {
+                "internalType": "bytes",
+                "name": "ancillaryData",
+                "type": "bytes"
+              },
+              {
                 "internalType": "int256",
                 "name": "salt",
                 "type": "int256"
@@ -141,6 +146,7 @@ function voteParams() {
             "identifier": "${price.identifier}",
             "time": "${price.time}",
             "price": "${price.price}",
+            "ancillaryData": "${price.ancillaryData}",
             "salt": "${salt}"
           }
         }`);
