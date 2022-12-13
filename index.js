@@ -199,7 +199,7 @@ function voteParams() {
           "contractInputsValues": {
             "voterAddress": "${safe}",
             "roundId": "${roundId}",
-            "toRetrieve": "[["${price.identifier}","${price.time}","${price.ancillaryData}"]]"
+            "toRetrieve": "[[\\"${price.identifier}\\",\\"${price.time}\\",\\"${price.ancillaryData}\\"]]"
           }
         }`);
   });
