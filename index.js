@@ -51,6 +51,8 @@ while (true) {
 
 let commits = [];
 let reveals = [];
+let rewards = [];
+
 function voteParams() {
   if (salt > Math.abs(magicNumber) || salt < magicNumber) {
     console.log("Salt is above or below magic number");
@@ -150,6 +152,56 @@ function voteParams() {
             "salt": "${salt}"
           }
         }`);
+
+    rewards.push(`
+        {
+          "to": "${votingContract}",
+          "value": "0",
+          "data": null,
+          "contractMethod": {
+            "inputs": [
+              {
+                "internalType": "address",
+                "name": "voterAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "roundId",
+                "type": "uint256"
+              },
+              {
+                "components": [
+                  {
+                    "internalType": "bytes32",
+                    "name": "identifier",
+                    "type": "bytes32"
+                  },
+                  {
+                    "internalType": "uint256",
+                    "name": "time",
+                    "type": "uint256"
+                  },
+                  {
+                    "internalType": "bytes",
+                    "name": "ancillaryData",
+                    "type": "bytes"
+                  }
+                ],
+                "internalType": "struct VotingAncillaryInterface.PendingRequestAncillary[]",
+                "name": "toRetrieve",
+                "type": "tuple[]"
+              }
+            ],
+            "name": "retrieveRewards",
+            "payable": false
+          },
+          "contractInputsValues": {
+            "voterAddress": "${safe}",
+            "roundId": "${roundId}",
+            "toRetrieve": "[[\\"${price.identifier}\\",\\"${price.time}\\",\\"${price.ancillaryData}\\"]]"
+          }
+        }`);
   });
 
   let voteJSON = (x) => `{
@@ -168,15 +220,20 @@ function voteParams() {
   }`;
 
   const commitConsole = new console.Console(
-    fs.createWriteStream(`./output_files/commits_${roundId}.json`)
+    fs.createWriteStream(`./output_files/${roundId}_commits.json`)
   );
 
   const revealConsole = new console.Console(
-    fs.createWriteStream(`./output_files/reveals_${roundId}.json`)
+    fs.createWriteStream(`./output_files/${roundId}_reveals.json`)
+  );
+
+  const retrieveConsole = new console.Console(
+    fs.createWriteStream(`./output_files/${roundId}_retrieve.json`)
   );
 
   commitConsole.log(voteJSON(commits));
   revealConsole.log(voteJSON(reveals));
+  retrieveConsole.log(voteJSON(rewards));
 }
 
 voteParams();
