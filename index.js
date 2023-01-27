@@ -2,7 +2,9 @@ const { getRandomSignedInt, computeVoteHashAncillary } = require("@uma/common");
 const fs = require("fs");
 
 // networks file (https://github.com/UMAprotocol/protocol/blob/master/packages/core/networks/1.json)
-let votingContract = "0x8B1631ab830d11531aE83725fDa4D86012eCCd77";
+let votingContract = "0x8B1631ab830d11531aE83725fDa4D86012eCCd77"; 
+// https://etherscan.io/address/0x8B1631ab830d11531aE83725fDa4D86012eCCd77#readContract
+// https://web3-type-converter.onbrn.com/
 
 // safe address (should not need to be changed)
 let safe = "0xC75aDbf2a5a6A51302c1c7cC789366ed16e1E0F3";
@@ -12,16 +14,17 @@ let safe = "0xC75aDbf2a5a6A51302c1c7cC789366ed16e1E0F3";
 // price you are voting for. Should be 0, 1000000000000000000, or magic number (-57896044618658097711785492504343953926634992332820282019728792003956564819968)
 // time: use voter dapp or logs
 
-let roundId = "9664"; // voter dapp or voting contract
+let roundId = "9692"; // voter dapp or voting contract
 let votes = [
   {
     identifier:
-      "0x4143524F53532D56320000000000000000000000000000000000000000000000",
+      "0x41646d696e203138350000000000000000000000000000000000000000000000",
     ancillaryData:
-      "0x6F6F5265717565737465723A63313836666139313433353363343462326533336562653035663231383436663130343862656461",
-    price: "0",
-    time: 1669328675,
+      "0x",
+    price: "1000000000000000000",
+    time: 1674765443,
   },
+  
   // Template for when there are multiple votes in a round.
   // {
   //   identifier:
