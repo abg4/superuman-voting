@@ -14,32 +14,15 @@ let safe = "0xC75aDbf2a5a6A51302c1c7cC789366ed16e1E0F3";
 // price you are voting for. Should be 0, 1000000000000000000, or magic number (-57896044618658097711785492504343953926634992332820282019728792003956564819968)
 // time: use voter dapp or logs
 
-let roundId = "9695"; // voter dapp or voting contract
+let roundId = "9702"; // voter dapp or voting contract
 let votes = [
   {
     identifier:
-      "0x41646d696e203138360000000000000000000000000000000000000000000000",
+      "0x41646d696e203138390000000000000000000000000000000000000000000000",
     ancillaryData:
       "0x",
     price: "1000000000000000000",
-    time: 1675262879,
-  },
-  {
-    identifier:
-      "0x41646d696e203138370000000000000000000000000000000000000000000000",
-    ancillaryData:
-      "0x",
-    price: "1000000000000000000",
-    time: 1675266035,
-  },
-
-  {
-    identifier:
-      "0x41646d696e203138380000000000000000000000000000000000000000000000",
-    ancillaryData:
-      "0x",
-    price: "1000000000000000000",
-    time: 1675276235,
+    time: 1676497739,
   },
   // Template for when there are multiple votes in a round.
   // {
